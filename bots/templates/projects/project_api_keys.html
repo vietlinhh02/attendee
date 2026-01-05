@@ -1,12 +1,56 @@
 {% extends 'projects/sidebar.html' %}
 
 {% block content %}    
+<style>
+    /* Glassmorphism for Modals */
+    .modal-content {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+    .modal-header {
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .modal-footer {
+        border-top: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    /* Table Styling */
+    .table {
+        --bs-table-bg: transparent;
+    }
+    .table thead th {
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+        font-weight: 600;
+        color: var(--color-darkest);
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        padding: 1rem 0.5rem;
+    }
+    .table tbody td {
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        padding: 1rem 0.5rem;
+        vertical-align: middle;
+    }
+    
+    /* Alert Styling */
+    .alert-info {
+        background-color: rgba(189, 232, 245, 0.4);
+        border: 1px solid rgba(73, 136, 196, 0.2);
+        color: var(--color-darkest);
+        backdrop-filter: blur(10px);
+    }
+</style>
+
     <!-- Create Modal -->
-    <div class="modal" id="createApiKeyModal" tabindex="-1">
-        <div class="modal-dialog">
+    <div class="modal fade" id="createApiKeyModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Create New API Key</h5>
+                    <h5 class="modal-title fw-bold">Create New API Key</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -17,9 +61,11 @@
                             {% csrf_token %}
                         <div class="mb-3">
                             <label for="keyName" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="keyName" name="name" required>
+                            <input type="text" class="form-control" id="keyName" name="name" required placeholder="e.g. Production Key">
                         </div>
-                        <button type="submit" class="btn btn-primary">Create</button>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Create</button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -27,8 +73,8 @@
     </div>
 
     <!-- Result Modal (will be populated after key creation) -->
-    <div class="modal" id="apiKeyResultModal" tabindex="-1">
-        <div class="modal-dialog">
+    <div class="modal fade" id="apiKeyResultModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content" id="apiKeyResult">
                 <!-- Content will be replaced by HTMX -->
             </div>
@@ -39,51 +85,53 @@
 
 <div class="container mt-4">
 
-    <div class="table-responsive" id="apiKeysTable">
+    <div class="table-responsive p-4 rounded-4" id="apiKeysTable" style="background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);">
         {% if api_keys %}
-            <div class="alert alert-info" role="alert">
+            <div class="alert alert-info border-0 rounded-3 mb-4" role="alert">
                 <i class="bi bi-play-circle me-2"></i>
                 Not sure how to use your API key? Check out this 
-                <a href="#" class="alert-link" data-bs-toggle="modal" data-bs-target="#videoTutorialModal">quick video</a>!
+                <a href="#" class="alert-link fw-semibold" data-bs-toggle="modal" data-bs-target="#videoTutorialModal">quick video</a>!
             </div>
-            <h2>API Keys</h2>
-            <!-- Create Button -->
-            <button class="btn btn-primary mb-3 mt-3" 
-                    data-bs-toggle="modal" 
-                    data-bs-target="#createApiKeyModal">
-                Create API Key
-            </button>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold mb-0" style="letter-spacing: -0.02em;">API Keys</h2>
+                <!-- Create Button -->
+                <button class="btn btn-primary" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#createApiKeyModal">
+                    Create API Key
+                </button>
+            </div>
 
-            <table class="table">
+            <table class="table align-middle">
                 <thead>
                     <tr>
                         <th>Name</th>
                         <th>Created</th>
-                        <th>Actions</th>
+                        <th class="text-end">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for key in api_keys %}
                     <tr>
-                        <td>{{ key.name }}</td>
-                        <td>{{ key.created_at|date:"M d, Y H:i" }}</td>
-                        <td>
-                            <button class="btn btn-danger btn-sm"
+                        <td class="fw-medium">{{ key.name }}</td>
+                        <td class="text-muted">{{ key.created_at|date:"M d, Y H:i" }}</td>
+                        <td class="text-end">
+                            <button class="btn btn-outline-danger btn-sm"
                                     data-bs-toggle="modal" 
                                     data-bs-target="#deleteModal{{ key.object_id }}">
                                 Delete
                             </button>
 
                             <!-- Delete Confirmation Modal -->
-                            <div class="modal" id="deleteModal{{ key.object_id }}" tabindex="-1">
-                                <div class="modal-dialog">
+                            <div class="modal fade" id="deleteModal{{ key.object_id }}" tabindex="-1">
+                                <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title">Confirm Deletion</h5>
+                                            <h5 class="modal-title fw-bold">Confirm Deletion</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                         </div>
-                                        <div class="modal-body">
-                                            <p>Are you sure you want to delete the API key "{{ key.name }}"? This action cannot be undone.</p>
+                                        <div class="modal-body text-start">
+                                            <p>Are you sure you want to delete the API key "<strong>{{ key.name }}</strong>"? This action cannot be undone.</p>
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

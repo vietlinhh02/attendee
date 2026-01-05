@@ -47,14 +47,14 @@ RUN apt-get update  \
     libpq-dev
 
 # Install Chrome dependencies
-RUN apt-get install -y xvfb x11-xkb-utils xfonts-100dpi xfonts-75dpi xfonts-scalable xfonts-cyrillic x11-apps libvulkan1 fonts-liberation xdg-utils wget
-# Install a specific version of Chrome.
+RUN apt-get install -y xvfb x11-xkb-utils xfonts-100dpi xfonts-75dpi xfonts-scalable xfonts-cyrillic x11-apps libvulkan1 fonts-liberation xdg-utils wget unzip
+# Install a specific version of Chrome - must match ChromeDriver version below
 RUN wget -q http://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_134.0.6998.88-1_amd64.deb
 RUN apt-get install -y ./google-chrome-stable_134.0.6998.88-1_amd64.deb
 
-# Install a specific version of ChromeDriver.
-RUN wget -q https://storage.googleapis.com/chrome-for-testing-public/134.0.6998.88/linux64/chromedriver-linux64.zip \
-    && unzip chromedriver-linux64.zip \
+# Install matching version of ChromeDriver
+RUN wget --timeout=30 -q https://storage.googleapis.com/chrome-for-testing-public/134.0.6998.88/linux64/chromedriver-linux64.zip \
+    && unzip -q chromedriver-linux64.zip \
     && mv chromedriver-linux64/chromedriver /usr/local/bin/chromedriver \
     && chmod +x /usr/local/bin/chromedriver \
     && rm -rf chromedriver-linux64 chromedriver-linux64.zip

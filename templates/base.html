@@ -5,29 +5,161 @@
     <link rel="icon" href="{% static 'images/logo.svg' %}">
     <title>Attendee</title>
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"> -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <!-- HTMX -->
     <!--  <script src="https://unpkg.com/htmx.org@2.0.3"></script>  -->
     <script src="https://unpkg.com/htmx.org@2.0.3/dist/htmx.js"></script>
 
     <style>
+        :root {
+            --color-darkest: #0f2854;
+            --color-dark: #1c4d8d;
+            --color-medium: #4988c4;
+            --color-light: #bde8f5;
+            --bs-primary: #1c4d8d;
+            --bs-primary-rgb: 28, 77, 141;
+            --bs-body-bg: #f4fbfe;
+            --border-radius-2xl: 1rem;
+        }
+
+        body {
+            background-color: var(--bs-body-bg);
+            color: var(--color-darkest);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Global Rounded 2XL */
+        .card, .btn, .form-control, .dropdown-menu, .modal-content, .alert, .list-group-item {
+            border-radius: var(--border-radius-2xl) !important;
+        }
+        
+        /* Sidebar Styling */
         .sidebar {
             min-height: 100vh;
-            background-color: #f8f9fa;
-            border-right: 1px solid #dee2e6;
+            background-color: rgba(15, 40, 84, 0.98) !important; /* Slightly translucent */
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border-right: 1px solid rgba(28, 77, 141, 0.5);
+            color: var(--color-light);
         }
         .sidebar .nav-link {
-            color: #333;
+            color: var(--color-light);
             padding: 0.5rem 1rem;
             cursor: pointer;
+            opacity: 0.9;
+            transition: all 0.2s ease;
+            border-radius: 0.5rem; /* Smaller radius for list items like macOS */
+            margin: 0.1rem 0.75rem;
+            font-weight: 500;
+            font-size: 0.95rem;
         }
         .sidebar .nav-link:hover {
-            background-color: #e9ecef;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            opacity: 1;
         }
         .sidebar .nav-link.active {
-            background-color: #0d6efd;
+            background-color: var(--color-medium);
             color: white;
+            opacity: 1;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .sidebar hr {
+            border-color: var(--color-medium);
+            opacity: 0.3;
+        }
+        
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--color-dark);
+            border-color: var(--color-dark);
+        }
+        .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+            background-color: var(--color-darkest) !important;
+            border-color: var(--color-darkest) !important;
+        }
+        
+        .btn-outline-primary {
+            color: var(--color-dark);
+            border-color: var(--color-dark);
+        }
+        .btn-outline-primary:hover {
+            background-color: var(--color-dark);
+            color: white;
+        }
+
+        /* Links */
+        a {
+            color: var(--color-dark);
+            text-decoration: none;
+        }
+        a:hover {
+            color: var(--color-darkest);
+            text-decoration: underline;
+        }
+
+        /* Cards */
+        .card {
+            border: none;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06); /* Softer, larger shadow */
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        /* Dropdowns in sidebar */
+        .sidebar .dropdown-menu {
+            background-color: var(--color-dark);
+            border: 1px solid var(--color-medium);
+        }
+        .sidebar .dropdown-item {
+            color: var(--color-light);
+        }
+        .sidebar .dropdown-item:hover {
+            background-color: var(--color-medium);
+            color: white;
+        }
+        .sidebar .dropdown-divider {
+            border-top-color: var(--color-medium);
+        }
+        
+        /* Project Selector specific overrides */
+        .sidebar .project-dropdown-toggle {
+            color: var(--color-light);
+            border: 1px solid var(--color-medium);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        .sidebar .project-dropdown-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* Bootstrap Utility Overrides */
+        .text-dark {
+            color: var(--color-darkest) !important;
+        }
+        .bg-info-subtle {
+            background-color: rgba(189, 232, 245, 0.5) !important;
+            color: var(--color-darkest) !important;
+        }
+        
+        /* List Group */
+        .list-group-item {
+            background-color: transparent;
+            border-color: rgba(73, 136, 196, 0.2);
+            color: var(--color-darkest);
+        }
+        
+        /* Form Controls */
+        .form-control:focus {
+            border-color: var(--color-medium);
+            box-shadow: 0 0 0 0.25rem rgba(73, 136, 196, 0.25);
+        }
+        .form-floating > label {
+            color: var(--color-dark);
         }
     </style>
 </head>

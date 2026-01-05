@@ -8,7 +8,7 @@
         <div class="col-md-3 col-lg-2 sidebar py-3 position-fixed overflow-auto" style="height: 100vh;">
             <div class="d-flex flex-column h-100">
                 <h5 class="px-3 mb-3">
-                    <img src="{% static 'images/logo_with_text.svg' %}" alt="Attendee Logo" class="img-fluid" style="max-width: 250px;">
+                    <img src="{% static 'images/logo_with_text.svg' %}" alt="Attendee Logo" class="img-fluid" style="max-width: 250px; filter: brightness(0) invert(1);">
                 </h5>
 
                 <!-- Project selector -->
@@ -17,7 +17,6 @@
                         <button class="btn project-dropdown-toggle w-100 d-flex align-items-center" type="button" id="currentProjectDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                             <div class="d-flex align-items-center">
                                 <span id="currentProjectName" class="project-name-multiline" style="font-size: 0.9rem; max-width: 100%;">{{ project.name }}</span>
-                                <i class="bi bi-chevron-down ms-2"></i>
                             </div>
                         </button>
                         <ul class="dropdown-menu w-100 shadow-sm" aria-labelledby="currentProjectDropdown">
@@ -34,7 +33,7 @@
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <a class="dropdown-item d-flex align-items-center" style="font-size: 0.9rem; max-width: 100%;" onclick="createNewProject()">
-                                        <i class="bi bi-plus-lg me-2"></i> Create new project
+                                        Create new project
                                     </a>
                                 </li>
                             {% endif %}
@@ -52,7 +51,7 @@
                        hx-swap="outerHTML"
                        hx-push-url="true"
                        onclick="setActiveLink(this)">
-                        <i class="bi bi-speedometer2"></i> Quick start
+                        Quick start
                     </a>
                     <a class="nav-link" 
                        hx-get="{% url 'projects:project-api-keys' project.object_id %}" 
@@ -61,20 +60,20 @@
                        hx-swap="outerHTML"
                        hx-push-url="true"
                        onclick="setActiveLink(this)">
-                        <i class="bi bi-key"></i> API Keys
+                        API Keys
                     </a>
                     <a class="nav-link" 
                         href="https://docs.attendee.dev"
                         target="_blank"
                         rel="noopener noreferrer">
-                        <i class="bi bi-book"></i> Docs
+                        Docs
                     </a>
                     
                     <!-- Settings dropdown menu -->
                     <div class="settings-dropdown">
                         <a class="nav-link" href="#" 
                            onclick="toggleSettingsMenu(event)">
-                            <i class="bi bi-gear"></i> Settings <span style="margin-left: 1px;" class="settings-caret-container">
+                            Settings <span style="margin-left: 1px;" class="settings-caret-container">
                               <svg width="21" height="21" viewBox="0 0 14 14" fill="none" class="settings-caret">
                                 <path d="M4.3225 5.0108L7 7.68247L9.6775 5.0108L10.5 5.8333L7 9.3333L3.5 5.8333L4.3225 5.0108Z" fill="currentcolor"></path>
                               </svg>
@@ -88,7 +87,7 @@
                                hx-swap="outerHTML"
                                hx-push-url="true"
                                onclick="setActiveLink(this)">
-                                <i class="bi bi-lock"></i> Credentials
+                                Credentials
                             </a>
                             {% if project.organization.is_webhooks_enabled %}
                             <a class="nav-link ps-4"
@@ -98,7 +97,7 @@
                                hx-swap="outerHTML"
                                hx-push-url="true"
                                onclick="setActiveLink(this)">
-                                <i class="bi bi-link"></i> Webhooks
+                                Webhooks
                             </a>
                             {% endif %}
                             {% if user.role == UserRole.ADMIN %}
@@ -109,7 +108,7 @@
                                 hx-swap="outerHTML"
                                 hx-push-url="true"
                                 onclick="setActiveLink(this)">
-                                    <i class="bi bi-card-text"></i> Project
+                                    Project
                                 </a>
                             {% endif %}
                         </div>
@@ -125,7 +124,7 @@
                        hx-swap="outerHTML"
                        hx-push-url="true"
                        onclick="setActiveLink(this)">
-                        <i class="bi bi-robot"></i> Bots
+                        Bots
                     </a>
 
                     <a class="nav-link" 
@@ -135,7 +134,7 @@
                        hx-swap="outerHTML"
                        hx-push-url="true"
                        onclick="setActiveLink(this)">
-                        <i class="bi bi-calendar3"></i> Calendars
+                        Calendars
                     </a>
 
                     {% if project.organization.is_app_sessions_enabled %}
@@ -146,7 +145,7 @@
                        hx-swap="outerHTML"
                        hx-push-url="true"
                        onclick="setActiveLink(this)">
-                        <i class="bi bi-app-indicator"></i> App Sessions
+                        App Sessions
                     </a>
                     {% endif %}
                 </nav>
@@ -161,7 +160,7 @@
                         <div class="account-dropdown">
                             <a class="nav-link" href="#" 
                             onclick="toggleAccountMenu(event)">
-                                <i class="bi bi-x-diamond-fill"></i> Account <span style="margin-left: 1px;" class="account-caret-container">
+                                Account <span style="margin-left: 1px;" class="account-caret-container">
                                 <svg width="21" height="21" viewBox="0 0 14 14" fill="none" class="account-caret">
                                     <path d="M4.3225 5.0108L7 7.68247L9.6775 5.0108L10.5 5.8333L7 9.3333L3.5 5.8333L4.3225 5.0108Z" fill="currentcolor"></path>
                                 </svg>
@@ -175,7 +174,7 @@
                                 hx-swap="outerHTML"
                                 hx-push-url="true"
                                 onclick="setActiveLink(this)">
-                                    <i class="bi bi-people"></i> Team
+                                    Team
                                 </a>
                                 {% if charge_credits_for_bots_setting %}
                                 <a class="nav-link ps-4"
@@ -185,7 +184,7 @@
                                 hx-swap="outerHTML"
                                 hx-push-url="true"
                                 onclick="setActiveLink(this)">
-                                    <i class="bi bi-credit-card"></i> Billing
+                                    Billing
                                 </a>
                                 {% endif %}
                             </div>
@@ -197,7 +196,7 @@
                     <form method="post" action="{% url 'account_logout' %}" class="m-0">
                         {% csrf_token %}
                         <button type="submit" class="nav-link border-0 bg-transparent w-100 text-start">
-                            <i class="bi bi-box-arrow-right"></i> Logout
+                            Logout
                         </button>
                     </form>
                 </div>
@@ -320,10 +319,7 @@
         transition-duration: 0s !important;
     }
 
-    .sidebar .nav-link.active {
-        background-color: rgba(0, 0, 0, 0.09);
-        color: inherit;
-    }
+    /* Removed conflicting .sidebar .nav-link.active style to use base.html's style */
     
     .sidebar {
         top: 0;
@@ -380,6 +376,7 @@
         border: none;
         padding: 0.5rem 0;
         font-weight: 500;
+        color: var(--color-light); /* Ensure text is visible */
     }
     .project-dropdown-toggle:focus {
         box-shadow: none;
@@ -393,7 +390,8 @@
     
     /* Fix for active dropdown item text color */
     .project-selector .dropdown-item.active {
-        color: #212529; /* Dark text color to ensure visibility */
+        color: white; /* White text for active item on dark background */
+        background-color: var(--color-medium);
     }
 </style>
 

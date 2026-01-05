@@ -20,19 +20,22 @@
     /* Updated styles for clickable rows */
     .clickable-row {
         cursor: pointer;
-        transition: background-color 0.15s ease-in-out;
+        transition: background-color 0.1s ease;
     }
     /* Apply hover effect to td elements */
     table tbody tr.clickable-row:hover td {
-        background-color: #f8f9fa;  /* Using Bootstrap's light gray */
+        background-color: rgba(189, 232, 245, 0.2);  /* Using theme light color */
     }
     
     /* Filter styles */
     .filter-container {
-        background-color: #f8f9fa;
-        padding: 15px;
-        border-radius: 5px;
+        background-color: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(5px);
+        padding: 1.5rem;
+        border-radius: 1rem;
         margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
     }
     .filter-item {
         margin-bottom: 10px;
@@ -40,7 +43,7 @@
     .state-checkboxes {
         display: flex;
         flex-wrap: wrap;
-        gap: 5px;
+        gap: 8px;
     }
     .state-checkbox {
         display: inline-flex;
@@ -50,24 +53,55 @@
     
     /* cURL Example styles */
     #apiCodeExample {
-        font-family: monospace;
+        font-family: 'SF Mono', Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
         white-space: pre;
         word-wrap: normal;
         display: block;
         line-height: 1.5;
+        font-size: 0.85rem;
+    }
+    
+    /* Table Styling */
+    .table {
+        --bs-table-bg: transparent;
+    }
+    .table thead th {
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+        font-weight: 600;
+        color: var(--color-darkest);
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        padding: 1rem 0.5rem;
+    }
+    .table tbody td {
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        padding: 1rem 0.5rem;
+        vertical-align: middle;
+    }
+    
+    /* Filter Header */
+    .filter-header {
+        background-color: rgba(255, 255, 255, 0.8) !important;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 0.75rem !important;
+        padding: 0.75rem 1rem !important;
+        font-weight: 500;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.02);
     }
 </style>
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         {% if session_type == SessionTypes.BOT %}
-            <h2>Bots</h2>
+            <h2 class="fw-bold" style="letter-spacing: -0.02em;">Bots</h2>
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createBotModal">
-                <i class="bi bi-plus-circle me-1"></i> Create Bot
+                Create Bot
             </button>
         {% endif %}
         {% if session_type == SessionTypes.APP_SESSION %}
-            <h2>App Sessions</h2>
+            <h2 class="fw-bold" style="letter-spacing: -0.02em;">App Sessions</h2>
         {% endif %}
     </div>
     
@@ -77,7 +111,6 @@
         <div class="filter-header p-2 rounded d-flex align-items-center" 
              style="background-color: #f8f9fa; cursor: pointer;" 
              onclick="toggleFilterPanel(event)">
-            <i class="bi bi-funnel me-2"></i>
             <span>Filters</span>
             <span style="margin-left: 5px;" class="filter-caret-container ms-auto">
                 <svg width="21" height="21" viewBox="0 0 14 14" fill="none" class="filter-caret" 
