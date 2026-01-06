@@ -5,6 +5,7 @@ import os
 import secrets
 import string
 from datetime import timedelta
+from urllib.parse import urlparse, urlunparse
 
 from concurrency.exceptions import RecordModifiedError
 from concurrency.fields import IntegerVersionField
@@ -2067,12 +2068,29 @@ class Recording(models.Model):
             return self.file.url
 
         # Generate a temporary signed URL that expires in 30 minutes (1800 seconds)
-        return self.file.storage.bucket.meta.client.generate_presigned_url(
+        presigned_url = self.file.storage.bucket.meta.client.generate_presigned_url(
             "get_object",
             Params={"Bucket": self.file.storage.bucket_name, "Key": self.file.name},
             ExpiresIn=1800,
         )
 
+        # Replace endpoint with public endpoint if configured
+        # This allows using a different endpoint for public access (e.g., localhost MinIO for development)
+        if hasattr(settings, "AWS_PUBLIC_ENDPOINT_URL") and settings.AWS_PUBLIC_ENDPOINT_URL:
+            public_endpoint = settings.AWS_PUBLIC_ENDPOINT_URL
+            public_parsed = urlparse(public_endpoint)
+            presigned_parsed = urlparse(presigned_url)
+
+            # Replace the scheme and netloc with public endpoint's values
+            # This works regardless of what the internal endpoint is
+            presigned_url = urlunparse(
+                presigned_parsed._replace(
+                    scheme=public_parsed.scheme,
+                    netloc=public_parsed.netloc,
+                )
+            )
+
+        return presigned_url
 
     OBJECT_ID_PREFIX = "rec_"
     object_id = models.CharField(max_length=32, unique=True, editable=False)
@@ -2764,12 +2782,29 @@ class BotDebugScreenshot(models.Model):
             return self.file.url
 
         # Generate a temporary signed URL that expires in 30 minutes (1800 seconds)
-        return self.file.storage.bucket.meta.client.generate_presigned_url(
+        presigned_url = self.file.storage.bucket.meta.client.generate_presigned_url(
             "get_object",
             Params={"Bucket": self.file.storage.bucket_name, "Key": self.file.name},
             ExpiresIn=1800,
         )
 
+        # Replace endpoint with public endpoint if configured
+        # This allows using a different endpoint for public access (e.g., localhost MinIO for development)
+        if hasattr(settings, "AWS_PUBLIC_ENDPOINT_URL") and settings.AWS_PUBLIC_ENDPOINT_URL:
+            public_endpoint = settings.AWS_PUBLIC_ENDPOINT_URL
+            public_parsed = urlparse(public_endpoint)
+            presigned_parsed = urlparse(presigned_url)
+
+            # Replace the scheme and netloc with public endpoint's values
+            # This works regardless of what the internal endpoint is
+            presigned_url = urlunparse(
+                presigned_parsed._replace(
+                    scheme=public_parsed.scheme,
+                    netloc=public_parsed.netloc,
+                )
+            )
+
+        return presigned_url
 
     def __str__(self):
         return f"Debug Screenshot {self.object_id} for event {self.bot_event}"
