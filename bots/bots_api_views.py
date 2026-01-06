@@ -1476,7 +1476,7 @@ class ParticipantEventsView(GenericAPIView):
     @extend_schema(
         operation_id="Get Participant Events",
         summary="Get participant events for a bot",
-        description="Returns the participant events (join/leave) for a bot. Results are paginated using cursor pagination.",
+        description="Returns the participant events (join/leave/update) for a bot. Results are paginated using cursor pagination. All events are stored in the database regardless of webhook configuration, allowing you to retrieve the full participant history even after the meeting has ended.",
         responses={
             200: OpenApiResponse(
                 response=ParticipantEventSerializer(many=True),
