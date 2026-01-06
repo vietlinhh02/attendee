@@ -490,6 +490,31 @@
         <!-- Participants Tab -->
         {% if participants %}
         <div class="tab-pane fade" id="participants" role="tabpanel">
+            <!-- API Example and Download Section -->
+            <div class="alert alert-info border-0 shadow-sm mb-4" style="background: linear-gradient(135deg, rgba(13, 110, 253, 0.1), rgba(13, 202, 240, 0.1)); border-radius: 1rem;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="mb-3"><i class="bi bi-code-square me-2"></i>API Access</h6>
+                        <p class="mb-2 small">Fetch participant events programmatically using our REST API:</p>
+                        <div class="bg-dark text-white p-3 rounded mb-3" style="font-family: 'Courier New', monospace; font-size: 0.85rem;">
+                            <code style="color: #4ec9b0;">GET</code> <code style="color: #ce9178;">{{ request.scheme }}://{{ request.get_host }}/api/v1/bots/{{ bot.object_id }}/participant_events</code>
+                        </div>
+                        <p class="mb-0 small text-muted">
+                            <i class="bi bi-info-circle me-1"></i>
+                            All events (join/leave/update) are stored permanently, even without webhook configuration.
+                            <a href="https://docs.attendee.dev/guides/participant-events" target="_blank" class="text-decoration-none">Learn more →</a>
+                        </p>
+                    </div>
+                    <div>
+                        <a href="{% url 'bots:project-bot-participant-events-export' object_id=project.object_id bot_object_id=bot.object_id %}" 
+                           class="btn btn-primary btn-sm shadow-sm"
+                           style="white-space: nowrap;">
+                            <i class="bi bi-download me-2"></i>Download JSON
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
             <div class="participants-list">
                 {% for participant in participants %}
                     <div class="participant-item border rounded p-3 mb-3 bg-light">
@@ -512,6 +537,20 @@
                                                             <i class="bi bi-box-arrow-in-right text-success"></i>
                                                         {% elif event.event_type == ParticipantEventTypes.LEAVE %}
                                                             <i class="bi bi-box-arrow-left text-danger"></i>
+                                                        {% elif event.event_type == ParticipantEventTypes.UPDATE %}
+                                                            <i class="bi bi-arrow-repeat text-primary"></i>
+                                                        {% elif event.event_type == ParticipantEventTypes.SPEAKING_START %}
+                                                            <i class="bi bi-chat-left-text text-info"></i>
+                                                        {% elif event.event_type == ParticipantEventTypes.SPEAKING_STOP %}
+                                                            <i class="bi bi-chat-left text-secondary"></i>
+                                                        {% elif event.event_type == ParticipantEventTypes.MICROPHONE_ON %}
+                                                            <i class="bi bi-mic-fill text-success"></i>
+                                                        {% elif event.event_type == ParticipantEventTypes.MICROPHONE_OFF %}
+                                                            <i class="bi bi-mic-mute-fill text-danger"></i>
+                                                        {% elif event.event_type == ParticipantEventTypes.CAMERA_ON %}
+                                                            <i class="bi bi-camera-video-fill text-success"></i>
+                                                        {% elif event.event_type == ParticipantEventTypes.CAMERA_OFF %}
+                                                            <i class="bi bi-camera-video-off-fill text-danger"></i>
                                                         {% endif %}
                                                     </div>
                                                     <div class="event-content flex-grow-1">
@@ -520,6 +559,20 @@
                                                                 Joined
                                                             {% elif event.event_type == ParticipantEventTypes.LEAVE %}
                                                                 Left
+                                                            {% elif event.event_type == ParticipantEventTypes.UPDATE %}
+                                                                Updated
+                                                            {% elif event.event_type == ParticipantEventTypes.SPEAKING_START %}
+                                                                Started Speaking
+                                                            {% elif event.event_type == ParticipantEventTypes.SPEAKING_STOP %}
+                                                                Stopped Speaking
+                                                            {% elif event.event_type == ParticipantEventTypes.MICROPHONE_ON %}
+                                                                Microphone On
+                                                            {% elif event.event_type == ParticipantEventTypes.MICROPHONE_OFF %}
+                                                                Microphone Off
+                                                            {% elif event.event_type == ParticipantEventTypes.CAMERA_ON %}
+                                                                Camera On
+                                                            {% elif event.event_type == ParticipantEventTypes.CAMERA_OFF %}
+                                                                Camera Off
                                                             {% endif %}
                                                         </div>
                                                         <div class="event-timestamp text-muted small">{{ event.created_at|date:"M d, Y H:i:s" }}</div>

@@ -47,6 +47,11 @@ urlpatterns = [
         name="project-bot-recordings",
     ),
     path(
+        "<str:object_id>/bots/<str:bot_object_id>/participant_events/export",
+        projects_views.ProjectBotParticipantEventsExportView.as_view(),
+        name="project-bot-participant-events-export",
+    ),
+    path(
         "<str:object_id>/credentials",
         projects_views.ProjectCredentialsView.as_view(),
         name="project-credentials",
