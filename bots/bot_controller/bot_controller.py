@@ -1357,14 +1357,14 @@ class BotController:
             },
         )
 
+        # Handle UPDATE events - update participant state
         if event["event_type"] == ParticipantEventTypes.UPDATE:
             if "isHost" in event["event_data"]:
                 participant.is_host = event["event_data"]["isHost"]["after"]
                 participant.save()
                 logger.info(f"Updated participant {participant.object_id} is host to {participant.is_host}")
-            # Don't save this event type in the database for now.
-            return
 
+        # Save all event types to database (JOIN, LEAVE, UPDATE, SPEAKING, DEVICE)
         participant_event = ParticipantEvent.objects.create(
             participant=participant,
             event_type=event["event_type"],
@@ -1376,12 +1376,17 @@ class BotController:
         if participant.is_the_bot:
             return
 
-        # Don't send webhook for non join / leave events
-        if participant_event.event_type != ParticipantEventTypes.JOIN and participant_event.event_type != ParticipantEventTypes.LEAVE:
-            return
+        # Send webhooks for JOIN/LEAVE events with the join_leave trigger
+        if participant_event.event_type == ParticipantEventTypes.JOIN or participant_event.event_type == ParticipantEventTypes.LEAVE:
+            trigger_webhook(
+                webhook_trigger_type=WebhookTriggerTypes.PARTICIPANT_EVENTS_JOIN_LEAVE,
+                bot=self.bot_in_db,
+                payload=participant_event_webhook_payload(participant_event),
+            )
 
+        # Send webhooks for all event types with the all events trigger
         trigger_webhook(
-            webhook_trigger_type=WebhookTriggerTypes.PARTICIPANT_EVENTS_JOIN_LEAVE,
+            webhook_trigger_type=WebhookTriggerTypes.PARTICIPANT_EVENTS_ALL,
             bot=self.bot_in_db,
             payload=participant_event_webhook_payload(participant_event),
         )

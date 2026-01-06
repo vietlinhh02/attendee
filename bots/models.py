@@ -1896,7 +1896,13 @@ class Participant(models.Model):
 class ParticipantEventTypes(models.IntegerChoices):
     JOIN = 1, "Join"
     LEAVE = 2, "Leave"
-    UPDATE = 5, "Update"  # Leave space for possible speech start / stop events
+    SPEAKING_START = 3, "Speaking Start"
+    SPEAKING_STOP = 4, "Speaking Stop"
+    UPDATE = 5, "Update"
+    MICROPHONE_ON = 6, "Microphone On"
+    MICROPHONE_OFF = 7, "Microphone Off"
+    CAMERA_ON = 8, "Camera On"
+    CAMERA_OFF = 9, "Camera Off"
 
     @classmethod
     def type_to_api_code(cls, value):
@@ -1904,7 +1910,13 @@ class ParticipantEventTypes(models.IntegerChoices):
         mapping = {
             cls.JOIN: "join",
             cls.LEAVE: "leave",
+            cls.SPEAKING_START: "speaking_start",
+            cls.SPEAKING_STOP: "speaking_stop",
             cls.UPDATE: "update",
+            cls.MICROPHONE_ON: "microphone_on",
+            cls.MICROPHONE_OFF: "microphone_off",
+            cls.CAMERA_ON: "camera_on",
+            cls.CAMERA_OFF: "camera_off",
         }
         return mapping.get(value)
 
@@ -2776,23 +2788,6 @@ class BotDebugScreenshot(models.Model):
             ExpiresIn=1800,
         )
 
-        # Replace endpoint with public endpoint if configured
-        # This allows using a different endpoint for public access (e.g., localhost MinIO for development)
-        if hasattr(settings, "AWS_PUBLIC_ENDPOINT_URL") and settings.AWS_PUBLIC_ENDPOINT_URL:
-            public_endpoint = settings.AWS_PUBLIC_ENDPOINT_URL
-            public_parsed = urlparse(public_endpoint)
-            presigned_parsed = urlparse(presigned_url)
-
-            # Replace the scheme and netloc with public endpoint's values
-            # This works regardless of what the internal endpoint is
-            presigned_url = urlunparse(
-                presigned_parsed._replace(
-                    scheme=public_parsed.scheme,
-                    netloc=public_parsed.netloc,
-                )
-            )
-
-        return presigned_url
 
     def __str__(self):
         return f"Debug Screenshot {self.object_id} for event {self.bot_event}"
@@ -2837,6 +2832,7 @@ class WebhookTriggerTypes(models.IntegerChoices):
     ASYNC_TRANSCRIPTION_STATE_CHANGE = 7, "Async Transcription State Change"
     ZOOM_OAUTH_CONNECTION_STATE_CHANGE = 8, "Zoom OAuth Connection State Change"
     BOT_LOGS_UPDATE = 9, "Bot Logs Update"
+    PARTICIPANT_EVENTS_ALL = 10, "All Participant Events"
     # add other event types here
 
     @classmethod
@@ -2852,6 +2848,7 @@ class WebhookTriggerTypes(models.IntegerChoices):
             cls.ASYNC_TRANSCRIPTION_STATE_CHANGE: "async_transcription.state_change",
             cls.ZOOM_OAUTH_CONNECTION_STATE_CHANGE: "zoom_oauth_connection.state_change",
             cls.BOT_LOGS_UPDATE: "bot_logs.update",
+            cls.PARTICIPANT_EVENTS_ALL: "participant_events.all",
         }
 
     @classmethod

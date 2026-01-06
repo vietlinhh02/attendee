@@ -93,6 +93,8 @@ class WebBotAdapter(BotAdapter):
         self.media_sending_enable_timestamp_ms = None
 
         self.participants_info = {}
+        self.participant_speaking_status = {}  # Track which participants are currently speaking
+        self.participant_device_outputs = {}  # Track device outputs (mic/camera) for each participant
         self.only_one_participant_in_meeting_at = None
         self.video_frame_ticker = 0
 
@@ -299,12 +301,84 @@ class WebBotAdapter(BotAdapter):
         # Count a caption as audio activity
         self.last_audio_message_processed_time = time.time()
         self.upsert_caption_callback(json_data["caption"])
+        
+        # Track speaking events based on caption updates
+        caption = json_data.get("caption", {})
+        device_id = caption.get("deviceId")
+        is_final = caption.get("isFinal", False)
+        
+        if device_id:
+            # When we get the first non-final caption, the participant started speaking
+            if not is_final and device_id not in self.participant_speaking_status:
+                self.participant_speaking_status[device_id] = True
+                self.add_participant_event_callback({
+                    "participant_uuid": device_id,
+                    "event_type": ParticipantEventTypes.SPEAKING_START,
+                    "event_data": {"text": caption.get("text", "")},
+                    "timestamp_ms": int(time.time() * 1000)
+                })
+            # When we get a final caption, the participant stopped speaking
+            elif is_final and device_id in self.participant_speaking_status:
+                del self.participant_speaking_status[device_id]
+                self.add_participant_event_callback({
+                    "participant_uuid": device_id,
+                    "event_type": ParticipantEventTypes.SPEAKING_STOP,
+                    "event_data": {"text": caption.get("text", "")},
+                    "timestamp_ms": int(time.time() * 1000)
+                })
 
     def handle_chat_message(self, json_data):
         if self.recording_paused and not self.record_chat_messages_when_paused:
             return
 
         self.upsert_chat_message_callback(json_data)
+
+    def handle_device_outputs_update(self, json_data):
+        """Handle device output changes (microphone and camera status)"""
+        device_outputs = json_data.get("deviceOutputs", [])
+
+        for output in device_outputs:
+            device_id = output.get("deviceId")
+            output_type = output.get("outputType")  # 1 = microphone, 2 = camera
+            disabled = output.get("disabled", 0)  # 0 = enabled, 1 = disabled
+            
+            if not device_id:
+                continue
+            
+            # Initialize tracking for this device if not exists
+            if device_id not in self.participant_device_outputs:
+                self.participant_device_outputs[device_id] = {}
+            
+            # Track previous state
+            prev_state = self.participant_device_outputs[device_id].get(output_type)
+            
+            # Update current state
+            self.participant_device_outputs[device_id][output_type] = disabled
+            
+            # Only emit events if state changed
+            if prev_state is not None and prev_state != disabled:
+                if output_type == 1:  # Microphone
+                    if disabled == 0:  # Enabled
+                        event_type = ParticipantEventTypes.MICROPHONE_ON
+                    else:  # Disabled
+                        event_type = ParticipantEventTypes.MICROPHONE_OFF
+                elif output_type == 2:  # Camera
+                    if disabled == 0:  # Enabled
+                        event_type = ParticipantEventTypes.CAMERA_ON
+                    else:  # Disabled
+                        event_type = ParticipantEventTypes.CAMERA_OFF
+                else:
+                    continue
+                
+                self.add_participant_event_callback({
+                    "participant_uuid": device_id,
+                    "event_type": event_type,
+                    "event_data": {
+                        "output_type": output_type,
+                        "disabled": disabled
+                    },
+                    "timestamp_ms": output.get("lastUpdated", int(time.time() * 1000))
+                })
 
     def mask_transcript_if_required(self, json_data):
         if not settings.MASK_TRANSCRIPT_IN_LOGS:
@@ -363,6 +437,9 @@ class WebBotAdapter(BotAdapter):
                         elif json_data.get("type") == "SilenceStatus":
                             if not json_data.get("isSilent"):
                                 self.last_audio_message_processed_time = time.time()
+
+                        elif json_data.get("type") == "DeviceOutputsUpdate":
+                            self.handle_device_outputs_update(json_data)
 
                         elif json_data.get("type") == "ChatStatusChange":
                             if json_data.get("change") == "ready_to_send":
