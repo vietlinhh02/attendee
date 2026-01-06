@@ -8,6 +8,7 @@ services:
     environment:
       - POSTGRES_HOST=postgres
       - REDIS_URL=redis://redis:6379/5
+      - AWS_ENDPOINT_URL=http://minio:9000
       - DJANGO_SETTINGS_MODULE=attendee.settings.development
       - ENABLE_CHROME_SANDBOX=false
     command: "celery -A attendee worker -l INFO"
