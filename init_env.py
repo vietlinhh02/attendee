@@ -21,6 +21,7 @@ def main():
     print("AWS_SECRET_ACCESS_KEY=minioadmin")
     print("AWS_DEFAULT_REGION=us-east-1")
     print("AWS_ENDPOINT_URL=http://minio:9000")
+    print("AWS_PUBLIC_ENDPOINT_URL=http://localhost:9000")
 
 
 if __name__ == "__main__":
