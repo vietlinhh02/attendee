@@ -37,6 +37,7 @@ from .models import (
     GoogleMeetBotLogin,
     GoogleMeetBotLoginGroup,
     Participant,
+    ParticipantEvent,
     ParticipantEventTypes,
     Project,
     ProjectAccess,
@@ -831,6 +832,35 @@ class ProjectBotRecordingsView(LoginRequiredMixin, ProjectUrlContextMixin, View)
         }
 
         return render(request, "projects/partials/project_bot_recordings.html", context)
+
+
+class ProjectBotParticipantEventsExportView(LoginRequiredMixin, ProjectUrlContextMixin, View):
+    """Export participant events as JSON file"""
+
+    def get(self, request, object_id, bot_object_id):
+        project = get_project_for_user(user=request.user, project_object_id=object_id)
+
+        try:
+            bot = Bot.objects.get(object_id=bot_object_id, project=project)
+        except Bot.DoesNotExist:
+            return HttpResponse("Bot not found", status=404)
+
+        # Get all participant events for this bot (excluding bot itself)
+        from .serializers import ParticipantEventSerializer
+
+        participant_events = ParticipantEvent.objects.filter(participant__bot=bot, participant__is_the_bot=False).select_related("participant").order_by("created_at")
+
+        # Serialize the events
+        serializer = ParticipantEventSerializer(participant_events, many=True)
+
+        # Create response with JSON data
+        response = HttpResponse(
+            json.dumps(serializer.data, indent=2),
+            content_type="application/json",
+        )
+        response["Content-Disposition"] = f'attachment; filename="participant_events_{bot_object_id}.json"'
+
+        return response
 
 
 class ProjectWebhooksView(LoginRequiredMixin, ProjectUrlContextMixin, View):
