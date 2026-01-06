@@ -2073,7 +2073,6 @@ class Recording(models.Model):
             ExpiresIn=1800,
         )
 
-
     OBJECT_ID_PREFIX = "rec_"
     object_id = models.CharField(max_length=32, unique=True, editable=False)
 
